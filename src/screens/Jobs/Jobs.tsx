@@ -4,6 +4,7 @@ import styles from "./Jobs.styles";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/types";
 import { useNavigation } from "@react-navigation/native";
+import { JobCard } from "../../components/JobCard/JobCard";
 
 type JobsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -18,8 +19,7 @@ const JobsScreen = ({}: JobScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <Text>Jobs screen</Text>
-      <Text onPress={() => navigateToJobDetails("1", "11")}>Example job</Text>
+      <JobCard onPress={() => navigateToJobDetails("1", "11")} />
     </View>
   );
 };

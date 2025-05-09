@@ -4,9 +4,8 @@ import { THEME } from "../../theme";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 30
+    padding: 10,
+    backgroundColor: "#FFFFFF",
   },
 });
 

@@ -1,0 +1,70 @@
+import { View, Text, Image, TouchableOpacity } from "react-native";
+import styles from "./JobCard.styles";
+import Feather from "@expo/vector-icons/Feather";
+
+interface JobCardProps {
+  jobImageUrl?: string;
+  jobTitle?: string;
+  jobCompany?: string;
+  jobHourlyRate?: string;
+  jobDistance?: number;
+  jobLocation?: string;
+  onPress?: () => void;
+}
+
+export const JobCard = ({
+  jobImageUrl = "https://picsum.photos/300/150",
+  jobTitle = "Construction General Helper",
+  jobCompany = "Steve Smith Construction",
+  jobHourlyRate = "13.50",
+  jobDistance = 5.3,
+  jobLocation = "430 Smith St, Chicago, IL 60654, USA",
+  onPress,
+}: JobCardProps) => {
+  return (
+    <View style={styles.cardContainer}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: jobImageUrl }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      </View>
+      <View style={styles.informationContainer}>
+        <Text style={styles.jobTitle}>{jobTitle}</Text>
+        <Text style={styles.jobCompany}>{jobCompany}</Text>
+      </View>
+      <View style={styles.detailsContainer}>
+        <View style={styles.detailRow}>
+          <Feather name="clock" size={25} color={"#000"} style={styles.icon} />
+          <View style={{ gap: 3 }}>
+            <Text style={styles.detailTitle}>Hourly Rate</Text>
+            <Text style={styles.detailInfo}>${jobHourlyRate}</Text>
+          </View>
+        </View>
+        <View style={styles.detailRow}>
+          <Feather
+            name="map-pin"
+            size={25}
+            color={"#000"}
+            style={styles.icon}
+          />
+          <View style={{ gap: 3 }}>
+            <Text style={styles.detailTitle}>Distance</Text>
+            <Text style={styles.detailInfo}>{jobDistance} miles</Text>
+          </View>
+        </View>
+        <View style={styles.detailRow}>
+          <Feather name="map" size={25} color={"#000"} style={styles.icon} />
+          <View style={{ gap: 3 }}>
+            <Text style={styles.detailTitle}>Location</Text>
+            <Text style={styles.detailInfo}>{jobLocation}</Text>
+          </View>
+        </View>
+        <TouchableOpacity onPress={onPress} style={styles.button}>
+          <Text style={styles.buttonText}>Find out more</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
