@@ -4,6 +4,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import RootStackNavigator from "./navigation/RootStackNavigator";
 
+import { Navbar } from "./components/Navbar/Navbar";
+
 const App = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
@@ -16,6 +18,8 @@ const App = () => {
         {Platform.OS === "ios" && (
           <SafeAreaView style={{ backgroundColor: "black" }} />
         )}
+        <Navbar />
+
         <NavigationContainer>
           <RootStackNavigator />
         </NavigationContainer>
