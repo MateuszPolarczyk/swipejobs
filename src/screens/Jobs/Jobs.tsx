@@ -19,7 +19,7 @@ const JobsScreen = ({}: JobScreenProps) => {
 
   return (
     <View style={styles.container}>
-      <JobCard onPress={() => navigateToJobDetails("1", "11")} />
+      <JobCard jobId="1" onPress={() => navigateToJobDetails("1", "11")} />
     </View>
   );
 };

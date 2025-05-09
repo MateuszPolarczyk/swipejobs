@@ -2,25 +2,39 @@ import { View, Text, Image, TouchableOpacity } from "react-native";
 import styles from "./JobCard.styles";
 import Feather from "@expo/vector-icons/Feather";
 
+import { getJobById } from "../../data/mock";
+
 interface JobCardProps {
-  jobImageUrl?: string;
-  jobTitle?: string;
-  jobCompany?: string;
-  jobHourlyRate?: string;
-  jobDistance?: number;
-  jobLocation?: string;
+  jobId: string;
   onPress?: () => void;
 }
 
-export const JobCard = ({
-  jobImageUrl = "https://picsum.photos/300/150",
-  jobTitle = "Construction General Helper",
-  jobCompany = "Steve Smith Construction",
-  jobHourlyRate = "13.50",
-  jobDistance = 5.3,
-  jobLocation = "430 Smith St, Chicago, IL 60654, USA",
-  onPress,
-}: JobCardProps) => {
+export const JobCard = ({ jobId, onPress }: JobCardProps) => {
+  const job = getJobById(jobId);
+
+  if (!job) {
+    return (
+      <View
+        style={[
+          styles.cardContainer,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <Feather name="cloud-off" size={60} color={"#000"} />
+        <Text>Job not found</Text>
+      </View>
+    );
+  }
+
+  const {
+    jobImageUrl,
+    jobTitle,
+    jobCompany,
+    jobHourlyRate,
+    jobDistance,
+    jobLocation,
+  } = job;
+
   return (
     <View style={styles.cardContainer}>
       <View style={styles.imageContainer}>
