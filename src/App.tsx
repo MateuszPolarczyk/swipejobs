@@ -1,30 +1,27 @@
-import { Assets as NavigationAssets } from '@react-navigation/elements';
-import { Asset } from 'expo-asset';
-import * as SplashScreen from 'expo-splash-screen';
-import * as React from 'react';
-import { Navigation } from './navigation';
+import { StatusBar, SafeAreaView, Platform } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-Asset.loadAsync([
-  ...NavigationAssets,
-  require('./assets/newspaper.png'),
-  require('./assets/bell.png'),
-]);
+import { NavigationContainer } from "@react-navigation/native";
+import RootStackNavigator from "./navigation/RootStackNavigator";
 
-SplashScreen.preventAutoHideAsync();
-
-export function App() {
+const App = () => {
   return (
-    <Navigation
-      linking={{
-        enabled: 'auto',
-        prefixes: [
-          // Change the scheme to match your app's scheme defined in app.json
-          'helloworld://',
-        ],
-      }}
-      onReady={() => {
-        SplashScreen.hideAsync();
-      }}
-    />
+    <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="black"
+          translucent={false}
+        />
+        {Platform.OS === "ios" && (
+          <SafeAreaView style={{ backgroundColor: "black" }} />
+        )}
+        <NavigationContainer>
+          <RootStackNavigator />
+        </NavigationContainer>
+      </GestureHandlerRootView>
+    </SafeAreaView>
   );
-}
+};
+
+export default App;
