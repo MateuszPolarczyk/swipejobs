@@ -43,7 +43,7 @@ export interface Job {
   shifts: Shift[];
   branch: string;
   branchPhoneNumber: string;
-  requirements?: string[];
+  requirements: string[];
 }
 
 export type JobsResponse = Job[];
