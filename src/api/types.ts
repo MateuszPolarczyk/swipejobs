@@ -46,4 +46,5 @@ export interface Job {
   requirements: string[];
 }
 
+
 export type JobsResponse = Job[];
