@@ -10,6 +10,8 @@ import {
   fetchWorkerProfile,
   fetchWorkerJobs,
   fetchAllWorkerData,
+  rejectJob as apiRejectJob,
+  acceptJob as apiAcceptJob,
 } from "../api";
 
 interface DataContextType {
@@ -20,6 +22,8 @@ interface DataContextType {
   fetchProfile: () => Promise<void>;
   fetchJobs: () => Promise<void>;
   refetchAll: () => Promise<void>;
+  rejectJob: (jobId: string) => Promise<{ success: boolean; message?: string }>;
+  acceptJob: (jobId: string) => Promise<{ success: boolean; message?: string }>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -75,6 +79,42 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const rejectJob = async (jobId: string) => {
+    if (!profile?.workerId) {
+      throw new Error("Worker ID not available");
+    }
+
+    try {
+      const result = await apiRejectJob(profile.workerId, jobId);
+      if (result.success) {
+        setJobs((prevJobs) => prevJobs.filter((job) => job.jobId !== jobId));
+      }
+      return result;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to reject job");
+      console.error("Job rejection error:", err);
+      return { success: false, message: "Failed to reject job" };
+    }
+  };
+
+  const acceptJob = async (jobId: string) => {
+    if (!profile?.workerId) {
+      throw new Error("Worker ID not available");
+    }
+
+    try {
+      const result = await apiAcceptJob(profile.workerId, jobId);
+      if (result.success) {
+        setJobs((prevJobs) => prevJobs.filter((job) => job.jobId !== jobId));
+      }
+      return result;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to accept job");
+      console.error("Job acceptance error:", err);
+      return { success: false, message: "Failed to accept job" };
+    }
+  };
+
   useEffect(() => {
     refetchAll();
   }, []);
@@ -89,6 +129,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({
         fetchProfile,
         fetchJobs,
         refetchAll,
+        rejectJob,
+        acceptJob,
       }}
     >
       {children}

@@ -8,6 +8,7 @@ import { Navbar } from "./components/Navbar/Navbar";
 
 import { DataProvider } from "./context/DataContext";
 
+import Toast from "react-native-toast-message";
 const App = () => {
   return (
     <DataProvider>
@@ -25,6 +26,7 @@ const App = () => {
 
           <NavigationContainer>
             <RootStackNavigator />
+            <Toast />
           </NavigationContainer>
         </GestureHandlerRootView>
       </SafeAreaView>

@@ -13,6 +13,9 @@ import styles from "./JobCard.styles";
 import { useNavigation } from "@react-navigation/native";
 import { useData } from "../../context/DataContext";
 
+import Toast from "react-native-toast-message";
+import { acceptJob, rejectJob } from "../../api";
+
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SWIPE_THRESHOLD = 160;
 const HINT_THRESHOLD = 80;
@@ -110,20 +113,76 @@ export const JobCard = ({ jobData, onSwipe, isFirstCard }: JobCardProps) => {
           setSwipeDirection(null);
         }
       },
-      onPanResponderRelease: (_, gesture) => {
+      onPanResponderRelease: async (_, gesture) => {
         if (Math.abs(gesture.dx) > SWIPE_THRESHOLD) {
-          Animated.timing(position, {
-            toValue: {
-              x: gesture.dx > 0 ? SCREEN_WIDTH + 100 : -SCREEN_WIDTH - 100,
-              y: gesture.dy,
-            },
-            duration: 200,
-            useNativeDriver: false,
-          }).start(() => {
-            position.setValue({ x: 0, y: 0 });
+          try {
+            const isRightSwipe = gesture.dx > 0;
+            let apiResponse;
+
             setSwipeDirection(null);
-            onSwipe();
-          });
+
+            if (isRightSwipe) {
+              apiResponse = await acceptJob(
+                profile?.workerId ?? "",
+                jobData.id
+              );
+            } else {
+              apiResponse = await rejectJob(
+                profile?.workerId ?? "",
+                jobData.id
+              );
+            }
+
+            if (!apiResponse.success) {
+              Animated.timing(position, {
+                toValue: { x: 0, y: 0 },
+                duration: 100,
+                useNativeDriver: false,
+              }).start();
+
+              Toast.show({
+                type: "error",
+                text1: "Job no longer available",
+                position: "bottom",
+                visibilityTime: 1000,
+              });
+              return;
+            }
+
+            Animated.timing(position, {
+              toValue: {
+                x: isRightSwipe ? SCREEN_WIDTH + 100 : -SCREEN_WIDTH - 100,
+                y: gesture.dy,
+              },
+              duration: 200,
+              useNativeDriver: false,
+            }).start(() => {
+              position.setValue({ x: 0, y: 0 });
+              onSwipe();
+            });
+
+            Toast.show({
+              type: "success",
+              text1: isRightSwipe ? "Job accepted!" : "Job rejected",
+              position: "bottom",
+              visibilityTime: 2000,
+            });
+          } catch (error) {
+            console.error("Swipe action failed:", error);
+            Animated.spring(position, {
+              toValue: { x: 0, y: 0 },
+              friction: 7,
+              tension: 40,
+              useNativeDriver: false,
+            }).start();
+
+            Toast.show({
+              type: "error",
+              text1: "Action failed",
+              position: "bottom",
+              visibilityTime: 1000,
+            });
+          }
         } else {
           Animated.spring(position, {
             toValue: { x: 0, y: 0 },
