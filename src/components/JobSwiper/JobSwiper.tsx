@@ -1,26 +1,49 @@
 import { useState, useEffect } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-
 import { styles } from "./JobSwiper.styles";
-
 import { JobCard } from "../JobCard/JobCard";
 import { useData } from "../../context/DataContext";
-import { Job } from "../../api/types";
 
 export const JobSwiper = () => {
-  const { jobs, isLoading, error } = useData();
-  const [currentJobs, setCurrentJobs] = useState(jobs);
+  const { jobs, isLoading, error, acceptJob, rejectJob } = useData();
+  const [hasShownInitialWave, setHasShownInitialWave] = useState(false);
+  const [currentJobs, setCurrentJobs] = useState<typeof jobs>([]);
+  const [hasSwipedAllJobs, setHasSwipedAllJobs] = useState(false);
 
   useEffect(() => {
-    setCurrentJobs(jobs);
+    if (jobs.length > 0) {
+      setCurrentJobs(jobs);
+      setHasSwipedAllJobs(false);
+    }
   }, [jobs]);
 
-  const handleSwipe = () => {
-    setCurrentJobs((prevJobs) => prevJobs.slice(1));
+  const handleSwipe = async (direction: "left" | "right", jobId: string) => {
+    try {
+      const result =
+        direction === "right" ? await acceptJob(jobId) : await rejectJob(jobId);
+
+      if (result && !hasShownInitialWave) {
+        setHasShownInitialWave(true);
+      }
+      return result.success;
+    } catch (err) {
+      console.error("Swipe action failed:", err);
+      return false;
+    }
   };
 
-  if (isLoading) {
+  const handleDismiss = () => {
+    setCurrentJobs((prevJobs) => {
+      const newJobs = prevJobs.slice(1);
+      if (newJobs.length === 0) {
+        setHasSwipedAllJobs(true);
+      }
+      return newJobs;
+    });
+  };
+
+  if (isLoading && jobs.length === 0 && !hasSwipedAllJobs) {
     return (
       <View style={styles.emptyContainer}>
         <ActivityIndicator size="large" color="#000" />
@@ -49,22 +72,25 @@ export const JobSwiper = () => {
     );
   }
 
-  const transformJobData = (job: Job): any => ({
-    id: job.jobId,
-    jobImageUrl: job.jobTitle.imageUrl,
-    jobTitle: job.jobTitle.name,
-    jobCompany: job.company.name,
-    jobHourlyRate: job.wagePerHourInCents / 100,
-    jobDistance: job.milesToTravel,
-    jobLocation: job.company.address.formattedAddress,
-  });
+  const currentJob = currentJobs[0];
+  const showWaveAnimation = !hasShownInitialWave;
 
   return (
     <View style={{ flex: 1 }}>
       <JobCard
-        jobData={transformJobData(currentJobs[0])}
+        key={currentJob.jobId}
+        jobData={{
+          id: currentJob.jobId,
+          jobImageUrl: currentJob.jobTitle.imageUrl,
+          jobTitle: currentJob.jobTitle.name,
+          jobCompany: currentJob.company.name,
+          jobHourlyRate: currentJob.wagePerHourInCents / 100,
+          jobDistance: currentJob.milesToTravel,
+          jobLocation: currentJob.company.address.formattedAddress,
+        }}
         onSwipe={handleSwipe}
-        isFirstCard={true}
+        isFirstCard={showWaveAnimation}
+        onDismiss={handleDismiss}
       />
     </View>
   );

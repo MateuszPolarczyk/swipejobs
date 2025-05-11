@@ -61,7 +61,6 @@ export const rejectJob = async (
     );
 
     const data = await response.json();
-    console.log(data);
 
     if (!response.ok) {
       return {
@@ -113,7 +112,6 @@ export const acceptJob = async (
     }
 
     const data = await response.json();
-    console.log(data);
 
     if (!response.ok) {
       return {

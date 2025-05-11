@@ -12,9 +12,7 @@ import Feather from "@expo/vector-icons/Feather";
 import styles from "./JobCard.styles";
 import { useNavigation } from "@react-navigation/native";
 import { useData } from "../../context/DataContext";
-
 import Toast from "react-native-toast-message";
-import { acceptJob, rejectJob } from "../../api";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SWIPE_THRESHOLD = 160;
@@ -32,20 +30,31 @@ interface Job {
 
 interface JobCardProps {
   jobData: Job;
-  onSwipe: () => void;
+  onSwipe: (direction: "left" | "right", jobId: string) => Promise<boolean>;
   isFirstCard?: boolean;
+  onDismiss: () => void;
 }
 
-export const JobCard = ({ jobData, onSwipe, isFirstCard }: JobCardProps) => {
+export const JobCard = ({
+  jobData,
+  onSwipe,
+  isFirstCard,
+  onDismiss,
+}: JobCardProps) => {
   const position = useRef(new Animated.ValueXY()).current;
   const isAnimating = useRef(false);
   const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | null>(
     null
   );
   const [animatedWave, setAnimatedWave] = useState(false);
-
   const navigation = useNavigation();
   const { profile } = useData();
+
+  const resetAnimationState = () => {
+    isAnimating.current = false;
+    setAnimatedWave(false);
+    setSwipeDirection(null);
+  };
 
   useEffect(() => {
     if (isFirstCard && !animatedWave) {
@@ -71,8 +80,7 @@ export const JobCard = ({ jobData, onSwipe, isFirstCard }: JobCardProps) => {
               duration: 1000,
               useNativeDriver: false,
             }).start(() => {
-              setAnimatedWave(false);
-              isAnimating.current = false;
+              resetAnimationState();
             });
           });
         });
@@ -81,8 +89,7 @@ export const JobCard = ({ jobData, onSwipe, isFirstCard }: JobCardProps) => {
       return () => {
         clearTimeout(timeout);
         position.stopAnimation();
-        setAnimatedWave(false);
-        isAnimating.current = false;
+        resetAnimationState();
       };
     }
   }, [isFirstCard]);
@@ -98,9 +105,8 @@ export const JobCard = ({ jobData, onSwipe, isFirstCard }: JobCardProps) => {
       onPanResponderGrant: () => {
         if (isAnimating.current) {
           position.stopAnimation();
-          setAnimatedWave(false);
-          isAnimating.current = false;
-          setSwipeDirection(null);
+          position.setValue({ x: 0, y: 0 });
+          resetAnimationState();
         }
       },
       onPanResponderMove: (_, gesture) => {
@@ -115,72 +121,61 @@ export const JobCard = ({ jobData, onSwipe, isFirstCard }: JobCardProps) => {
       },
       onPanResponderRelease: async (_, gesture) => {
         if (Math.abs(gesture.dx) > SWIPE_THRESHOLD) {
-          try {
-            const isRightSwipe = gesture.dx > 0;
-            let apiResponse;
+          const isRightSwipe = gesture.dx > 0;
+          setSwipeDirection(null);
 
-            setSwipeDirection(null);
+          try {
+            await new Promise<void>((resolve) => {
+              Animated.timing(position, {
+                toValue: {
+                  x: isRightSwipe ? SCREEN_WIDTH + 100 : -SCREEN_WIDTH - 100,
+                  y: gesture.dy,
+                },
+                duration: 200,
+                useNativeDriver: false,
+              }).start(() => {
+                position.setValue({ x: 0, y: 0 });
+                resolve();
+              });
+            });
 
             if (isRightSwipe) {
-              apiResponse = await acceptJob(
-                profile?.workerId ?? "",
-                jobData.id
-              );
-            } else {
-              apiResponse = await rejectJob(
-                profile?.workerId ?? "",
-                jobData.id
-              );
-            }
-
-            if (!apiResponse.success) {
-              Animated.timing(position, {
-                toValue: { x: 0, y: 0 },
-                duration: 100,
-                useNativeDriver: false,
-              }).start();
-
+              const success = await onSwipe("right", jobData.id);
+              if (!success) {
+                Toast.show({
+                  type: "error",
+                  text1: "Job unavailable",
+                  text2: "This job is no longer available, check next one.",
+                  position: "top",
+                  visibilityTime: 2500,
+                });
+                return;
+              }
               Toast.show({
-                type: "error",
-                text1: "Job no longer available",
-                position: "bottom",
-                visibilityTime: 1000,
+                type: "success",
+                text1: "Job accepted!",
+                position: "top",
+                visibilityTime: 2000,
               });
-              return;
+            } else {
+              await onSwipe("left", jobData.id);
+              Toast.show({
+                type: "info",
+                text1: "Job rejected",
+                position: "top",
+                visibilityTime: 2000,
+              });
             }
 
-            Animated.timing(position, {
-              toValue: {
-                x: isRightSwipe ? SCREEN_WIDTH + 100 : -SCREEN_WIDTH - 100,
-                y: gesture.dy,
-              },
-              duration: 200,
-              useNativeDriver: false,
-            }).start(() => {
-              position.setValue({ x: 0, y: 0 });
-              onSwipe();
-            });
-
-            Toast.show({
-              type: "success",
-              text1: isRightSwipe ? "Job accepted!" : "Job rejected",
-              position: "bottom",
-              visibilityTime: 2000,
-            });
+            onDismiss();
           } catch (error) {
-            console.error("Swipe action failed:", error);
-            Animated.spring(position, {
-              toValue: { x: 0, y: 0 },
-              friction: 7,
-              tension: 40,
-              useNativeDriver: false,
-            }).start();
-
+            console.error("Swipe failed:", error);
             Toast.show({
               type: "error",
               text1: "Action failed",
-              position: "bottom",
-              visibilityTime: 1000,
+              text2: "Please try again",
+              position: "top",
+              visibilityTime: 2000,
             });
           }
         } else {
