@@ -1,9 +1,10 @@
-import { View, Text, Image, TouchableOpacity, Linking } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import styles from "./Profile.styles";
 import Feather from "@expo/vector-icons/Feather";
 
 import { useData } from "../../context/DataContext";
 import { formatUSPhoneNumber } from "../../helpers/phoneNumber";
+import { openInMap } from "../../helpers/openMap";
 
 interface ProfileProps {}
 
@@ -12,11 +13,9 @@ const ProfileScreen = ({}: ProfileProps) => {
 
   const formattedPhoneNumber = formatUSPhoneNumber(profile?.phoneNumber);
 
-  const userAdressMap = () => {
+  const showUserLocation = () => {
     if (profile?.address.formattedAddress) {
-      Linking.openURL(
-        `https://www.google.com/maps/search/?api=1&query=${profile?.address.formattedAddress}`
-      );
+      openInMap(profile.address.formattedAddress);
     }
   };
 
@@ -49,7 +48,7 @@ const ProfileScreen = ({}: ProfileProps) => {
         <TouchableOpacity
           style={styles.detailRow}
           onPress={() => {
-            userAdressMap();
+            showUserLocation();
           }}
         >
           <Feather

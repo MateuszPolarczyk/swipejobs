@@ -8,6 +8,8 @@ import { useData } from "../../context/DataContext";
 import { Job } from "../../api/types";
 import { formatUSPhoneNumber } from "../../helpers/phoneNumber";
 
+import { openInMap } from "../../helpers/openMap";
+
 interface RouteParams {
   id: string;
   workerId: string;
@@ -62,6 +64,12 @@ const JobDetails = () => {
     }
   };
 
+  const showJobLocation = () => {
+    if (job.company.address.formattedAddress) {
+      openInMap(job.company.address.formattedAddress);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity
@@ -113,7 +121,10 @@ const JobDetails = () => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.detailRow}>
+        <TouchableOpacity
+          style={styles.detailRow}
+          onPress={() => showJobLocation()}
+        >
           <Feather name="map-pin" size={20} />
           <View style={styles.detailRight}>
             <Text style={styles.sectionTitle}>
