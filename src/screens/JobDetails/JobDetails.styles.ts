@@ -34,48 +34,77 @@ export default StyleSheet.create({
     marginBottom: 16,
   },
   content: {
-    paddingBottom: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
+  jobTitle: {
+    fontSize: 26,
+    fontWeight: "800",
     marginBottom: 4,
+    color: "#000",
   },
-  subtitle: {
+  companyName: {
     fontSize: 16,
     color: "#777",
-    marginBottom: 12,
+    marginBottom: 16,
+    fontWeight: "500",
   },
-  detailRow: {
+  infoRow: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-    gap: 8,
+    justifyContent: "space-between",
+    backgroundColor: THEME.colors.accent,
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 16,
   },
-  detailText: {
-    fontSize: 15,
-    color: "#333",
+  infoColumn: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#FFF",
+    marginBottom: 4,
+  },
+  infoValue: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#FFF",
+  },
+  dollarSign: {
+    fontSize: 12,
+    color: "#fff",
   },
   section: {
-    marginTop: 16,
-    marginBottom: 8,
+    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "600",
     marginBottom: 6,
+    color: "#111",
   },
   sectionSubtitle: {
     fontSize: 12,
     fontWeight: "300",
   },
-  shiftRow: {
+  detailRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
+    gap: 12,
+    marginBottom: 16,
   },
-  shiftLabel: {
-    fontWeight: "600",
+  detailRight: {
+    flex: 1,
+    gap: 4,
+  },
+  detailText: {
+    fontSize: 15,
+    color: "#333",
+  },
+  smallNote: {
+    fontSize: 12,
+    color: "#888",
   },
   requirementText: {
     fontSize: 15,
