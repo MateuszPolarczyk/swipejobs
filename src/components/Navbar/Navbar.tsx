@@ -6,13 +6,14 @@ interface NavbarProps {}
 export const Navbar = ({}: NavbarProps) => {
   const { profile } = useData();
   return (
-    <View style={styles.navbar} accessibilityRole="header">
+    <View style={styles.navbar} accessibilityRole="header" testID="navbar">
       <Image
         source={require("../../assets/swipejobs-logo-light.png")}
         style={styles.logo}
         resizeMode="contain"
         accessible
         accessibilityLabel={"Swipejobs logo"}
+        testID="navbar-logo"
       />
       <Text style={{ color: "#FFF" }}>
         {profile ? `${profile?.firstName} ${profile?.lastName}` : ""}
