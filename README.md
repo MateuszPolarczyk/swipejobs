@@ -31,6 +31,13 @@ A React Native mobile application that allows users to browse and swipe through 
 
 ## 📦 Getting Started
 
+Prepare .env variable
+
+```text
+Change WORKER_ID in .env-example to the correct one
+Save this file as .env
+```
+
 Install dependencies:
 
 ```bash
