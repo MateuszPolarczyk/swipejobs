@@ -1,9 +1,9 @@
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-
 import Feather from "@expo/vector-icons/Feather";
-import styles from "./JobDetails.styles";
+import Toast from "react-native-toast-message";
 
+import styles from "./JobDetails.styles";
 import { useData } from "../../context/DataContext";
 import { Job } from "../../api/types";
 import { formatUSPhoneNumber } from "../../helpers/phoneNumber";
@@ -18,7 +18,7 @@ const JobDetails = () => {
   const route = useRoute();
   const { id } = route.params as RouteParams;
 
-  const { jobs } = useData();
+  const { jobs, acceptJob, rejectJob, removeJob } = useData();
   const job: Job | undefined = jobs.find((j) => j.jobId === id);
 
   if (!job) {
@@ -41,6 +41,31 @@ const JobDetails = () => {
   } = job;
 
   const hourlyRate = (wagePerHourInCents / 100).toFixed(2);
+
+  const handleJobRejection = async () => {
+    const result = await rejectJob(id);
+
+    const isUnavailable =
+      result.message?.toLowerCase().includes("available") ?? false;
+
+    if (result.success || isUnavailable) {
+      removeJob(id);
+
+      Toast.show({
+        type: "success",
+        text1: "Job Rejected",
+      });
+
+      navigation.navigate("MainTabs", {
+        screen: "Jobs",
+      });
+    } else {
+      Toast.show({
+        type: "error",
+        text1: result.message || "Failed to reject job",
+      });
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -134,12 +159,30 @@ const JobDetails = () => {
       </View>
 
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={[styles.button, styles.noButton]}>
+        <TouchableOpacity
+          style={[styles.button, styles.noButton]}
+          onPress={handleJobRejection}
+        >
           <Text style={[styles.buttonText, styles.noButtonText]}>
             No Thanks
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.yesButton]}>
+
+        <TouchableOpacity
+          style={[styles.button, styles.yesButton]}
+          onPress={async () => {
+            const result = await acceptJob(id);
+            Toast.show({
+              type: result.success ? "success" : "error",
+              text1: result.success
+                ? "Job Accepted"
+                : result.message || "Failed to accept job",
+            });
+            if (result.success) {
+              navigation.navigate("MainTabs", { screen: "Jobs" });
+            }
+          }}
+        >
           <Text style={styles.buttonText}>I'll Take that</Text>
         </TouchableOpacity>
       </View>

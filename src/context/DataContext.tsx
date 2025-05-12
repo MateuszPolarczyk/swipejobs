@@ -24,6 +24,7 @@ interface DataContextType {
   refetchAll: () => Promise<void>;
   rejectJob: (jobId: string) => Promise<{ success: boolean; message?: string }>;
   acceptJob: (jobId: string) => Promise<{ success: boolean; message?: string }>;
+  removeJob: (jobId: string) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -115,6 +116,10 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const removeJob = (jobId: string) => {
+    setJobs((prevJobs) => prevJobs.filter((job) => job.jobId !== jobId));
+  };
+
   useEffect(() => {
     refetchAll();
   }, []);
@@ -131,6 +136,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({
         refetchAll,
         rejectJob,
         acceptJob,
+        removeJob,
       }}
     >
       {children}
