@@ -7,7 +7,7 @@ interface JobScreenProps {}
 
 const JobsScreen = ({}: JobScreenProps) => {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="job-swiper">
       <JobSwiper />
     </View>
   );

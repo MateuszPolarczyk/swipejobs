@@ -5,10 +5,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import RootStackNavigator from "./navigation/RootStackNavigator";
 
 import { Navbar } from "./components/Navbar/Navbar";
+import Toast from "react-native-toast-message";
 
 import { DataProvider } from "./context/DataContext";
-
-import Toast from "react-native-toast-message";
 const App = () => {
   return (
     <DataProvider>
