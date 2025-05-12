@@ -70,7 +70,7 @@ npm test
 
 ## 🖼️ Screenshots
 
-| Jobs | Job Details | Job Details |
+| Jobs | Job Details | Profile |
 |-------------|-------------|---------|
 | ![Jobs](https://i.imgur.com/1KQgAA8.png) | ![Job details](https://i.imgur.com/DtZhgz7.png) | ![Profile](https://i.imgur.com/3kngVqk.png)
 
