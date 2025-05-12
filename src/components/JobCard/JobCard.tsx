@@ -144,8 +144,7 @@ export const JobCard = ({
               if (!success) {
                 Toast.show({
                   type: "error",
-                  text1: "Job unavailable",
-                  text2: "This job is no longer available, check next one.",
+                  text1: "This job is no longer available, check next one.",
                   position: "top",
                   visibilityTime: 2500,
                 });
@@ -160,8 +159,8 @@ export const JobCard = ({
             } else {
               await onSwipe("left", jobData.id);
               Toast.show({
-                type: "info",
-                text1: "Job rejected",
+                type: "error",
+                text1: "Job rejected!",
                 position: "top",
                 visibilityTime: 2000,
               });
